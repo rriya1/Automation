@@ -13,11 +13,11 @@ def get_song_names_from_playlist(url):
 
 def get_existing_songs(csv_path):
     if not os.path.exists(csv_path):
-        with open(csv_path, 'w', newline='') as file:
+        with open(csv_path, 'w', newline='', encoding='utf-8') as file:
             pass  # Just create an empty file
         return []
 
-    with open(csv_path, 'r') as file:
+    with open(csv_path, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         return [row[0] for row in reader]
 
