@@ -1,6 +1,8 @@
+# first fetch all videos and then write the data
 import os
 import csv
-from pytube import Playlist
+import time
+from pytube import Playlist, YouTube
 
 
 def sanitize_filename(filename):
@@ -49,7 +51,6 @@ def main():
     directory = input(
         "Enter the directory where you want to save the CSV file: ")
 
-    # Ensure the directory exists
     os.makedirs(directory, exist_ok=True)
 
     playlist_title = get_playlist_title(playlist_url)
@@ -61,8 +62,18 @@ def main():
     existing_videos = get_existing_videos(csv_path)
 
     playlist = Playlist(playlist_url)
-    new_videos = [{'title': video.title, 'url': video.watch_url}
-                  for video in playlist.videos if video.watch_url not in existing_videos]
+    new_videos = []
+
+    for url in playlist.video_urls:
+        try:
+            time.sleep(2)  # Delay to avoid rate limits
+            video = YouTube(url)  # Fetch video details
+            print(f"Retrieving: {video.title}")
+            if video.watch_url not in existing_videos:
+                new_videos.append(
+                    {'title': video.title, 'url': video.watch_url})
+        except Exception as e:
+            print(f"Error retrieving video details: {e}")
 
     if new_videos:
         save_new_videos_to_csv(csv_path, new_videos)
