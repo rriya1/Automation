@@ -27,19 +27,21 @@ def get_csv_path(directory, playlist_title):
 
 
 def get_existing_videos(csv_path):
+    # Ensure to open with utf-8-sig even for reading to maintain consistency
     if not os.path.exists(csv_path):
-        with open(csv_path, 'w', newline='', encoding='utf-8') as file:
+        with open(csv_path, 'w', newline='', encoding='utf-8-sig') as file:
             writer = csv.writer(file)
             # Create file with header if it doesn't exist
             writer.writerow(["Title", "URL"])
         return {}
-    with open(csv_path, mode='r', encoding='utf-8') as file:
+    with open(csv_path, mode='r', encoding='utf-8-sig') as file:
         reader = csv.DictReader(file)
         return {row["URL"]: row["Title"] for row in reader}
 
 
 def save_video_to_csv(csv_path, video):
-    with open(csv_path, 'a', newline='', encoding='utf-8') as file:
+    # Consistently use 'utf-8-sig' for appending to ensure BOM is present
+    with open(csv_path, 'a', newline='', encoding='utf-8-sig') as file:
         writer = csv.writer(file)
         writer.writerow([video['title'], video['url']])
 
@@ -68,7 +70,6 @@ def main():
             print(f"Retrieving: {video.title}")
             if video.watch_url not in existing_videos:
                 new_video = {'title': video.title, 'url': video.watch_url}
-                # Save immediately to CSV
                 save_video_to_csv(csv_path, new_video)
         except Exception as e:
             print(f"Error retrieving video details: {e}")
